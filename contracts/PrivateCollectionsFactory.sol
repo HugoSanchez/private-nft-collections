@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.2 < 0.9.0;
 
-import "contracts/private-cols/PrivateCollection.sol";
-import "contracts/private-cols/CollectionRegistry.sol";
+import "./PrivateCollection.sol";
+import "./CollectionsRegistry.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CollectionFactory is Ownable {

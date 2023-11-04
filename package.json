@@ -10,15 +10,26 @@
   },
   "dependencies": {
     "@lit-protocol/lit-node-client": "^3.0.16",
+    "@metamask/sdk-react": "^0.11.2",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts-upgradeable": "^4.9.0",
+    "@rainbow-me/rainbowkit": "^1.2.0",
     "@walletconnect/web3-provider": "^1.8.0",
     "autoprefixer": "10.4.16",
     "crypto-js": "^4.2.0",
-    "ethers": "^5.7.2",
+    "ethers": "^6.8.1",
     "next": "14.0.1",
     "postcss": "8.4.31",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwindcss": "3.3.5",
+    "viem": "^1.18.4",
+    "wagmi": "^1.4.5",
     "web3modal": "^1.9.12"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.4",
+    "hardhat": "^2.19.0"
   }
 }
