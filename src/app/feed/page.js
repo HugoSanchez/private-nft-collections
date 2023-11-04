@@ -12,10 +12,6 @@ export default function Feed({ children }) {
 	return (
 		<main>
 
-			<Drawer isOpen={isOpen} setIsOpen={setIsOpen}>
-				<p>Hello</p>
-			</Drawer>
-
 			<div className="px-5 md:px-16 mt-32">
 				<div className="grid grid-cols-4 gap-8">
 					{
@@ -36,8 +32,10 @@ export default function Feed({ children }) {
 						})
 					}
 				</div>
-				<div className='fixed bottom-10 right-10'>
-					<div className='h-14 w-14 rounded-full flex items-center justify-center pb-1 bg-green-100'>
+				<div className='fixed bottom-10 right-10 cursor-pointer'>
+					<div 
+						onClick={() => setIsOpen(true)}
+						className='h-14 w-14 rounded-full flex items-center justify-center pb-1 bg-green-100'>
 						<p className='text-black text-4xl font-light'>+</p>
 					</div>
 				</div>

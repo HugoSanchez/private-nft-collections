@@ -14,7 +14,7 @@ export function Drawer(props) {
         >
         <section
             className={
-            "w-screen max-w-72 sm:max-w-md right-0 absolute bg-zinc50 h-full shadow-xl delay-400 duration-500 ease-in-out transition-all transform  " +
+            "w-screen max-w-72 sm:max-w-md right-0 absolute bg-white h-screen shadow-xl delay-400 duration-500 ease-in-out transition-all transform  " +
             (isOpen ? " translate-x-0 " : " translate-x-full ")
             }
         >
