@@ -2,7 +2,13 @@
 
 import Link from 'next/link'
 import { Drawer } from '../../../components/Drawer'
+import { ethers } from 'ethers'
 import { useState } from 'react'
+
+import Factory from '../../../artifacts/contracts/PrivateCollectionsFactory.sol/CollectionFactory.json'
+
+const REGISTRY = "0xF288F6080cCC82eDDDd4B5AdCEB1dd262d6Ddd6a"
+const FACTORY = "0xF288F6080cCC82eDDDd4B5AdCEB1dd262d6Ddd6a"
 
 
 export default function Create({ children }) {
@@ -10,6 +16,22 @@ export default function Create({ children }) {
 	const [title, setTitle] = useState()
     const [description, setDescription] = useState()
     const [fileName, setFileName] = useState()
+
+
+    const createCollection = async () => {
+        window.ethereum.enable()
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        let account = await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        console.log(account[0])
+
+        const FactoryContract = new ethers.Contract(FACTORY, Factory.abi, signer)
+        await FactoryContract.connect(signer)
+        let tx = await FactoryContract.createCollection("https://arweave.net/onaWXNLR8_fZ_f1WqH1PBVGDq0KSXH1dMuX-rwQtxQk", "000000005000000000")
+        let receipt = await tx.wait()
+    }
+
+
 
 
     const handleImageUpload = () => {
@@ -75,7 +97,9 @@ export default function Create({ children }) {
 
 
                 <div className='w-full h-16 bg-white flex flex-col items-center justify-center'>
-                    <button className='flex flex-col items-center justify-center'>
+                    <button
+                        onClick={() => createCollection()} 
+                        className='flex flex-col items-center justify-center'>
                         <p className='text-black text-xl font-semibold'>Mint Collection</p>
                     </button>
                 </div>

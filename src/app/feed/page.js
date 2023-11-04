@@ -17,7 +17,7 @@ export default function Feed({ children }) {
 					{
 						[1,1,1,1,1,1,1,1,1,1].map((item, index) => {
 							return (
-								<div>
+								<div key={index}>
 									<Link href={'/feed/collection'}>
 										<div className="w-full h-72 border border-white">
 										</div>
