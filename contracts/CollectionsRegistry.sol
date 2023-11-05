@@ -64,7 +64,8 @@ contract CollectionRegistry is ERC1155Upgradeable, OwnableUpgradeable, UUPSUpgra
     function _setTokenMetadata(
         uint256 tokenId,
         string memory url
-    ) internal virtual returns (string memory) {
+    ) public virtual returns (string memory) {
+        require(msg.sender == creator[tokenId]);
         require(bytes(_uris[tokenId]).length == 0, "URI already set");
         _uris[tokenId] = url;
         return _uris[tokenId];
@@ -74,23 +75,21 @@ contract CollectionRegistry is ERC1155Upgradeable, OwnableUpgradeable, UUPSUpgra
     // Core functionality
     ///////////////////////////////
 
-    function createCollection (
+    function create (
         bytes memory data, 
-        string calldata url, 
-        address _collectionAddress,
         uint _price,
         address _creator
     )
         public
         payable
+        returns (uint)
     {   
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
         _mint(_creator, newTokenId, 1, data);
-        _setTokenMetadata(newTokenId, url);
         creator[newTokenId] = _creator;  
-        collectionAddress[newTokenId] = _collectionAddress;
-        price[newTokenId] = _price;      
+        price[newTokenId] = _price;   
+        return newTokenId;   
     }
 
     function collect(uint id, address recipient, bytes memory data)

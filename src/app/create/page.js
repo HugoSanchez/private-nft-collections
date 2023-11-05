@@ -4,10 +4,15 @@ import Link from 'next/link'
 import { Drawer } from '../../../components/Drawer'
 import { ethers } from 'ethers'
 import { useState } from 'react'
+import CryptoJS from 'crypto-js';
+import { AES } from 'crypto-js';
+const crypto = require('crypto')
 
-import Factory from '../../../artifacts/contracts/PrivateCollectionsFactory.sol/CollectionFactory.json'
+import { encrypt } from '../../../lib/lit'
 
-const REGISTRY = "0xF288F6080cCC82eDDDd4B5AdCEB1dd262d6Ddd6a"
+import Collection from '../../../artifacts/contracts/CollectionsRegistry.sol/CollectionRegistry.json'
+
+const REGISTRY = "0xb24aEE5bcBb6d3B9eB8066EA2f48d19603fCe069"
 const FACTORY = "0xF288F6080cCC82eDDDd4B5AdCEB1dd262d6Ddd6a"
 
 
@@ -28,27 +33,37 @@ export default function Create({ children }) {
         const signer = provider.getSigner();
         console.log(account[0])
 
-        let url = await uploadMetadataToAreweave()
-        console.log(url)
+        
+        const CollectionContract = new ethers.Contract(REGISTRY, Collection.abi, signer)
+        await CollectionContract.connect(signer)
+        let tx = await FactoryContract.create("https://arweave.net/onaWXNLR8_fZ_f1WqH1PBVGDq0KSXH1dMuX-rwQtxQk", "000000005000000000")
+        let receipt = await tx.wait()
+   
+        // let url = await uploadMetadataToAreweave()
+
 
         /** 
         const FactoryContract = new ethers.Contract(FACTORY, Factory.abi, signer)
         await FactoryContract.connect(signer)
-        let tx = await FactoryContract.createCollection("https://arweave.net/onaWXNLR8_fZ_f1WqH1PBVGDq0KSXH1dMuX-rwQtxQk", "000000005000000000")
+        let tx = await FactoryContract.create("https://arweave.net/onaWXNLR8_fZ_f1WqH1PBVGDq0KSXH1dMuX-rwQtxQk", "000000005000000000")
         let receipt = await tx.wait()
         */
     }
 
 
-    const uploadMetadataToAreweave = async () => {
-        console.log(image)
-        console.log(mimetype)
+    const uploadMetadataToAreweave = async (tokenId) => {
+        let {cif, data} = await createCiphers(tokenId)
         let base = process.env.NEXT_PUBLIC_BASE_URL + '/arweave'
         let response = await fetch(base, {
             method: 'POST',
-            body: JSON.stringify({title, description, image, mimetype})
+            body: JSON.stringify({title, description, image, mimetype, cif, data})
         })
         return await response.json()
+    }
+
+    const createCiphers = async (tokenId) => {
+        let randombytes = crypto.randomBytes(256).toString('hex')
+        return await encrypt(randombytes, tokenId)
     }
 
 
