@@ -16,6 +16,9 @@ export default function Create({ children }) {
 	const [title, setTitle] = useState()
     const [description, setDescription] = useState()
     const [fileName, setFileName] = useState()
+    const [image, setImage] = useState()
+    const [mimetype, setMimeType] = useState()
+
 
 
     const createCollection = async () => {
@@ -25,18 +28,46 @@ export default function Create({ children }) {
         const signer = provider.getSigner();
         console.log(account[0])
 
+        let url = await uploadMetadataToAreweave()
+        console.log(url)
+
+        /** 
         const FactoryContract = new ethers.Contract(FACTORY, Factory.abi, signer)
         await FactoryContract.connect(signer)
         let tx = await FactoryContract.createCollection("https://arweave.net/onaWXNLR8_fZ_f1WqH1PBVGDq0KSXH1dMuX-rwQtxQk", "000000005000000000")
         let receipt = await tx.wait()
+        */
     }
 
 
-
-
-    const handleImageUpload = () => {
-
+    const uploadMetadataToAreweave = async () => {
+        console.log(image)
+        console.log(mimetype)
+        let base = process.env.NEXT_PUBLIC_BASE_URL + '/arweave'
+        let response = await fetch(base, {
+            method: 'POST',
+            body: JSON.stringify({title, description, image, mimetype})
+        })
+        return await response.json()
     }
+
+
+    const handleImageUpload = (e) => {
+        let file = e.target.files[0]
+        e.preventDefault()
+
+		if (!!file) {
+            let reader = new FileReader()
+            reader.onload = () => {
+                let imageBase64 = reader.result;
+                let trimed64 = imageBase64.split(',')[1];
+                setImage(trimed64)
+                setMimeType(file.type)
+                setFileName(file.name)
+            };
+            reader.readAsDataURL(file);
+        }
+	}
 
 	return (
 		<main>

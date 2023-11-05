@@ -1,4 +1,5 @@
 import Bundlr from "@bundlr-network/client";
+import { NextResponse } from "next/server";
 
 export const config = {
     api: {
@@ -9,29 +10,33 @@ export const config = {
     },
 }
 
-export default async function POST(
+export async function POST(
     req, 
     res
-) {
+) {     
+
     try {
+        
+        
         let imageUrl
-        let body = JSON.parse(req.body)
-        let haschanged = true
-        if (body.hasChanged == false) {
-             haschanged = body.hasChanged }
-        if (body.image && haschanged) {
-            let image = body.image
+        let data = await req.json()
+        let {title, description, image, mimetype} = data
+
+        console.log(mimetype)
+
+        if (image) {
             const buffer = Buffer.from(image, 'base64')
-            let tags = {tags: [{ name: "Content-Type", value: body.mimeType }],}
+            let tags = {tags: [{ name: "Content-Type", value: mimetype }],}
             let id = await uploadToArweave(buffer, tags)
             imageUrl = `https://arweave.net/${id}`
         }
 
-        let dataToUpload = haschanged ? {...body, image: imageUrl} : {...body}
+        let dataToUpload = image ? {...data, image: imageUrl} : {...data}
         let id = await uploadToArweave(JSON.stringify(dataToUpload), false)
-        res.status(200).json({
-            url: `https://arweave.net/${id}`
-        })
+        return new NextResponse(JSON.stringify({ url: `https://arweave.net/${id}` }), {
+            status: 200,
+        });
+
     } catch (e) {
         console.log(e)
         res.status(500).json({
