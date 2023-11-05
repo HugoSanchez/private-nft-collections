@@ -12,7 +12,7 @@ import { encrypt } from '../../../lib/lit'
 
 import Collection from '../../../artifacts/contracts/CollectionsRegistry.sol/CollectionRegistry.json'
 
-const REGISTRY = "0xb24aEE5bcBb6d3B9eB8066EA2f48d19603fCe069"
+const COLLECTION_ADDRESS = "0x513D41b00E4213024327D6FCcfFcaE58cF69B6Aa"
 const FACTORY = "0xF288F6080cCC82eDDDd4B5AdCEB1dd262d6Ddd6a"
 
 
@@ -24,9 +24,8 @@ export default function Create({ children }) {
     const [image, setImage] = useState()
     const [mimetype, setMimeType] = useState()
 
-
-
     const createCollection = async () => {
+        
         window.ethereum.enable()
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         let account = await provider.send("eth_requestAccounts", []);
@@ -34,35 +33,37 @@ export default function Create({ children }) {
         console.log(account[0])
 
         
-        const CollectionContract = new ethers.Contract(REGISTRY, Collection.abi, signer)
+        const CollectionContract = new ethers.Contract(COLLECTION_ADDRESS, Collection.abi, signer)
         await CollectionContract.connect(signer)
-        let tx = await FactoryContract.create("https://arweave.net/onaWXNLR8_fZ_f1WqH1PBVGDq0KSXH1dMuX-rwQtxQk", "000000005000000000")
-        let receipt = await tx.wait()
-   
-        // let url = await uploadMetadataToAreweave()
-
-
-        /** 
-        const FactoryContract = new ethers.Contract(FACTORY, Factory.abi, signer)
-        await FactoryContract.connect(signer)
-        let tx = await FactoryContract.create("https://arweave.net/onaWXNLR8_fZ_f1WqH1PBVGDq0KSXH1dMuX-rwQtxQk", "000000005000000000")
-        let receipt = await tx.wait()
-        */
+        let tx = await CollectionContract.create("0x", "000000005000000000", account[0])
+        await tx.wait()
+        let bigInt = await CollectionContract.getTokenId()
+        let tokenId = parseInt(bigInt._hex).toString()
+        
+        let randombytes = crypto.randomBytes(256).toString('hex')
+        let encryptedImage = AES.encrypt(image, randombytes)
+        let {cif, hash} = await encrypt(randombytes, tokenId)
+        
+        let data = await uploadMetadataToAreweave(cif, hash, encryptedImage.toString())
+        console.log('URL: ', data.url)
+        await CollectionContract._setTokenMetadata(tokenId, data.url)
+    
     }
 
 
-    const uploadMetadataToAreweave = async (tokenId) => {
-        let {cif, data} = await createCiphers(tokenId)
+    const uploadMetadataToAreweave = async (cif, hash, encImage) => {
         let base = process.env.NEXT_PUBLIC_BASE_URL + '/arweave'
         let response = await fetch(base, {
             method: 'POST',
-            body: JSON.stringify({title, description, image, mimetype, cif, data})
+            body: JSON.stringify({title, description, encImage, mimetype, cif, hash})
         })
         return await response.json()
     }
 
     const createCiphers = async (tokenId) => {
         let randombytes = crypto.randomBytes(256).toString('hex')
+        let encryptedImage = AES.encrypt(image, randombytes)
+		setImage(encryptedImage.toString())
         return await encrypt(randombytes, tokenId)
     }
 

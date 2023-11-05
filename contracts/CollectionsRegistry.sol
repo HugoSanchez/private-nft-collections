@@ -55,6 +55,11 @@ contract CollectionRegistry is ERC1155Upgradeable, OwnableUpgradeable, UUPSUpgra
     // Basic functions get/set
     ///////////////////////////////
 
+     // Get token URI
+    function getTokenId() public view returns (uint) {
+        return _tokenIds.current();
+    }
+
     // Get token URI
     function uri(uint tokenID) override public view returns (string memory) {
         return string.concat(_uris[tokenID]);
